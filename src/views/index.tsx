@@ -1,7 +1,8 @@
+import type { App } from "../types";
+
 import { styled, css } from "goober";
 import { Update } from "../lib/ui/utils";
 import { Updater } from "../lib/ui/types";
-import type { CounterStore } from "../types";
 import { fade } from "../updaters";
 
 type ActionFn = () => void;
@@ -10,7 +11,7 @@ export function TitleView({
   state,
   transition,
   start,
-}: Pick<CounterStore, "state" | "transition"> & { start: ActionFn }) {
+}: Pick<App["store"], "state" | "transition"> & { start: ActionFn }) {
   if (state.type !== "title") return null;
 
   return (
@@ -27,7 +28,7 @@ export function CounterView({
   state,
   inc,
   dec,
-}: Pick<CounterStore, "state"> & { inc: ActionFn; dec: ActionFn }) {
+}: Pick<App["store"], "state"> & { inc: ActionFn; dec: ActionFn }) {
   if (state.type !== "count") return null;
 
   return (
@@ -50,7 +51,7 @@ const RoomContainer = styled("div")`
 export function RoomView({
   room,
   state,
-}: Pick<CounterStore, "room" | "state">) {
+}: Pick<App["store"], "room" | "state">) {
   if (state.type === "title") return null;
   if (room === false) return null;
 
@@ -73,7 +74,7 @@ const waitingClass = css(`
 
 export const WaitingViews: [
   ($el: HTMLElement) => void,
-  Updater<Pick<CounterStore, "waiting">>
+  Updater<Pick<App["store"], "waiting">>
 ] = [
   ($el) => {
     $el.innerHTML = "⌛";

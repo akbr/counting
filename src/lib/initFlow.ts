@@ -2,22 +2,19 @@ import { createSocketManager, SocketManager } from "./socket/socketManager";
 
 import type {
   EngineTypesShape,
-  ServerTypes,
   OutputsWith,
   InputsWith,
   Engine,
+  Room,
 } from "./server/types";
 import { createServer } from "./server";
 
 import { WaitFn, Transition } from "./ui/types";
 import { createTransitionMeter } from "./meter";
 
-import {
-  default as createZStore,
-  StoreApi as ZStoreApi,
-} from "zustand/vanilla";
+import { default as createZStore, StoreApi } from "zustand/vanilla";
 
-type ManagerWith<ET extends EngineTypesShape> = SocketManager<
+type SocketManagerWith<ET extends EngineTypesShape> = SocketManager<
   InputsWith<ET>,
   OutputsWith<ET>
 >;
@@ -27,26 +24,28 @@ export type AppStates<ET extends EngineTypesShape> =
   | { type: "title" }
   | ET["states"];
 
-export type Store<ET extends EngineTypesShape> = {
+export type StoreState<ET extends EngineTypesShape> = {
   state: AppStates<ET>;
   transition: Transition;
-  room: ServerTypes<ET>["states"]["data"];
+  room: Room["data"];
   waiting: boolean;
 };
 
-export type StoreApi<ET extends EngineTypesShape> = ZStoreApi<Store<ET>>;
-
-export type Kit<ET extends EngineTypesShape> = {
-  send: ManagerWith<ET>["send"];
-  wait: WaitFn;
+export type AppTypes<ET extends EngineTypesShape> = {
+  store: StoreState<ET>;
+  storeApi: StoreApi<StoreState<ET>>;
+  kit: {
+    send: SocketManagerWith<ET>["send"];
+    wait: WaitFn;
+  };
 };
 
 export function createStore<ET extends EngineTypesShape>(
-  manager: ManagerWith<ET>
+  manager: SocketManagerWith<ET>
 ) {
-  const meter = createTransitionMeter<Store<ET>["state"]>();
+  const meter = createTransitionMeter<StoreState<ET>["state"]>();
 
-  const store = createZStore<Store<ET>>(() => ({
+  const store = createZStore<StoreState<ET>>(() => ({
     state: { type: "init" },
     transition: undefined as Transition,
     room: false,

@@ -7,7 +7,9 @@ import { initScenes } from "./scenes";
 
 setup(h);
 
-const { server, manager, store, meter, kit } = initFlow<CounterTypes>(engine);
+const connect = engine;
+// const connect = "ws://localhost:5000";
+const { server, manager, store, meter, kit } = initFlow<CounterTypes>(connect);
 
 initScenes(store, kit);
 

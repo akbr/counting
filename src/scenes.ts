@@ -1,7 +1,12 @@
-import { SceneSetup, CounterStoreApi, CounterKit } from "./types";
+import { App } from "./types";
 import { TitleView, CounterView, RoomView, WaitingViews } from "./views";
 import { createPreactScene, createScene } from "./lib/ui/utils";
 import shallow from "zustand/shallow";
+
+type SceneSetup = (
+  store: App["storeApi"],
+  kit: App["kit"]
+) => void | (() => void);
 
 export const setups: SceneSetup[] = [
   function title(store, { wait, send }) {
@@ -78,6 +83,6 @@ export const setups: SceneSetup[] = [
   },
 ];
 
-export const initScenes = (store: CounterStoreApi, kit: CounterKit) => {
+export const initScenes = (store: App["storeApi"], kit: App["kit"]) => {
   setups.forEach((setup) => setup(store, kit));
 };
