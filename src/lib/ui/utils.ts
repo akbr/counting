@@ -1,4 +1,4 @@
-import type { Status, Updater, Scene, StatusLogger } from "./types";
+import type { Status, Updater, Scene, WaitFn } from "./types";
 
 import {
   h,
@@ -6,21 +6,25 @@ import {
   FunctionComponent,
   ComponentChildren,
   Fragment,
-  Ref
+  Ref,
 } from "preact";
 import { useRef, useLayoutEffect } from "preact/hooks";
 
 type ViewOptions = {
-  wait?: StatusLogger;
+  wait?: WaitFn;
+  init?: ($el: HTMLElement) => void;
 };
 
 export function createScene<Props>(
   $root: HTMLElement,
-  refresh: Updater<Props>,
-  { wait }: ViewOptions = {}
+  update: Updater<Props>,
+  { wait, init }: ViewOptions = {}
 ): Scene<Props> {
+  if (init) {
+    init($root);
+  }
   return function scene(props: Props) {
-    let status = refresh($root, props);
+    let status = update($root, props);
     if (wait) wait(status);
     return status;
   };
@@ -44,7 +48,7 @@ export function createPreactScene<Props>(
 export const Update = <T>({
   props,
   fn,
-  children
+  children,
 }: {
   props: T;
   fn: Updater<T>;

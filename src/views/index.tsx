@@ -1,35 +1,23 @@
-import { styled } from "goober";
-import { style } from "./lib/ui/stylus";
-import { Update } from "./lib/ui/utils";
-import { Updater } from "./lib/ui/types";
-import type { CounterStore } from "./store";
+import { styled, css } from "goober";
+import { Update } from "../lib/ui/utils";
+import { Updater } from "../lib/ui/types";
+import type { CounterStore } from "../types";
+import { fade } from "../updaters";
 
 type ActionFn = () => void;
-
-const fadeIn: Updater<CounterStore["transition"]> = ($el, props) => {
-  if (props === "in") {
-    style($el, { opacity: 0, y: -20 });
-    return style($el, { opacity: 1, y: 0 }, { duration: 300, easing: "ease" });
-  } else if (!props) {
-    style($el, { opacity: 1 });
-  } else if (props === "out") {
-    style($el, { opacity: 1 });
-    return style($el, { opacity: 0 }, { duration: 300, easing: "ease" });
-  }
-};
 
 export function TitleView({
   state,
   transition,
-  start
+  start,
 }: Pick<CounterStore, "state" | "transition"> & { start: ActionFn }) {
   if (state.type !== "title") return null;
 
   return (
-    <Update fn={fadeIn} props={transition}>
+    <Update fn={fade} props={transition}>
       <div style={{ textAlign: "center" }}>
-        <h1>Counting game!</h1>
-        <button onClick={start}>Start</button>
+        <h1>Counting Game</h1>
+        <button onClick={start}>Start!</button>
       </div>
     </Update>
   );
@@ -38,13 +26,13 @@ export function TitleView({
 export function CounterView({
   state,
   inc,
-  dec
+  dec,
 }: Pick<CounterStore, "state"> & { inc: ActionFn; dec: ActionFn }) {
   if (state.type !== "count") return null;
 
   return (
     <div>
-      <div>Count: {state.data} !</div>
+      <div>Count: {state.data}</div>
       <button onClick={inc}>+</button>
       <button onClick={dec}>-</button>
     </div>
@@ -61,7 +49,7 @@ const RoomContainer = styled("div")`
 
 export function RoomView({
   room,
-  state
+  state,
 }: Pick<CounterStore, "room" | "state">) {
   if (state.type === "title") return null;
   if (room === false) return null;
@@ -75,3 +63,23 @@ export function RoomView({
     </RoomContainer>
   );
 }
+
+const waitingClass = css(`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 0.5em;
+`);
+
+export const WaitingViews: [
+  ($el: HTMLElement) => void,
+  Updater<Pick<CounterStore, "waiting">>
+] = [
+  ($el) => {
+    $el.innerHTML = "⌛";
+    $el.className = waitingClass;
+  },
+  ($el, { waiting }) => {
+    $el.style.opacity = waiting ? String(1) : String(0);
+  },
+];

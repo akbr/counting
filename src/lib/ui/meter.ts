@@ -1,17 +1,12 @@
-import type { Controls, StatusLogger } from "./types";
+import type { Controls, Status, Transition } from "./types";
 
-export interface Meter<T> {
-  push: (state: T) => void;
-  proceed: () => void;
-  wait: StatusLogger;
-  onRelease: (listener: (state: T) => void) => void;
-}
-
-export function createMeter<T>(): Meter<T> {
+export function createMeter<T>() {
   let queue: T[] = [];
   let locked = false;
   let pending: Controls[] = [];
+  let activeCycle = false;
   let emit: (state: T) => void;
+  let changeListener: (state: boolean) => void;
 
   function next() {
     if (locked) return;
@@ -21,20 +16,28 @@ export function createMeter<T>(): Meter<T> {
       let state = queue.shift()!;
       if (emit) emit(state);
     }
+    if (activeCycle) {
+      activeCycle = false;
+      changeListener && changeListener(false);
+    }
   }
 
   next();
 
   return {
-    push: (x) => {
-      queue.push(x);
+    push: (state: T) => {
+      queue.push(state);
       next();
     },
     proceed: () => {
       locked = false;
+      if (pending.length) {
+        activeCycle = true;
+        changeListener && changeListener(true);
+      }
       next();
     },
-    wait: (t) => {
+    wait: (t: Status) => {
       if (!t) return;
       t = Array.isArray(t) ? t : [t];
       t.forEach((control) => {
@@ -45,9 +48,16 @@ export function createMeter<T>(): Meter<T> {
         });
       });
     },
-    onRelease: (listener) => {
+    onRelease: (listener: (state: T) => void) => {
       emit = listener;
-    }
+    },
+    skip: () => {
+      pending.forEach((c) => c.finish());
+    },
+    log: () => pending,
+    onChange: (listener: (state: boolean) => void) => {
+      changeListener = listener;
+    },
   };
 }
 
@@ -60,7 +70,6 @@ function pairwise<T, R>(fn: (state: T, prevState?: T) => R) {
   };
 }
 
-export type Transition = "in" | "out" | undefined;
 type TransitionTuple<T> = [T, Transition];
 export function injectTransition<T>(push: (arg: TransitionTuple<T>) => void) {
   return pairwise<T, void>((curr, prev) => {
@@ -75,6 +84,6 @@ export function createTransitionMeter<T>() {
   let push = injectTransition(meter.push);
   return {
     ...meter,
-    push
+    push,
   };
 }

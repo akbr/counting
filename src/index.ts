@@ -1,19 +1,18 @@
-import { init } from "./store";
-import * as subscriptions from "./subscriptions";
-
 import { h } from "preact";
 import { setup } from "goober";
+
+import { initFlow } from "./lib/initFlow";
+
+import { engine, CounterTypes } from "./engine";
+import { initScenes } from "./scenes";
+
 setup(h);
 
-let initStuff = init();
-let { server, manager, store, meter } = initStuff;
+const { server, manager, store, meter, kit } = initFlow<CounterTypes>(engine);
 
-Object.values(subscriptions).forEach((subscription) => subscription(initStuff));
+initScenes(store, kit);
 
-//meter.push({ type: "title" });
+// ---
+
+meter.push({ type: "title" });
 manager.openSocket();
-
-manager.send(["server", { type: "join", data: { id: "test" } }])
-manager.send(["engine", { type: "inc" }])
-manager.send(["engine", { type: "inc" }])
-manager.send(["engine", { type: "inc" }])
