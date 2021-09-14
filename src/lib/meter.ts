@@ -1,4 +1,4 @@
-import type { Controls, Status, Transition } from "./types";
+import type { Controls, Status, Transition } from "./ui/types";
 
 export function createMeter<T>() {
   let queue: T[] = [];

@@ -1,4 +1,4 @@
-import { Engine } from "./lib/server/types";
+import { Engine } from "../lib/server/types";
 
 export type CounterTypes = {
   states: { type: "count"; data: number };

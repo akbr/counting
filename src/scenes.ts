@@ -5,7 +5,7 @@ import shallow from "zustand/shallow";
 
 export const setups: SceneSetup[] = [
   function title(store, { wait, send }) {
-    let titleScene = createPreactScene(
+    const titleScene = createPreactScene(
       document.getElementById("title")!,
       TitleView,
       { wait }
@@ -24,7 +24,7 @@ export const setups: SceneSetup[] = [
     );
   },
   function counter(store, { wait, send }) {
-    let countScene = createPreactScene(
+    const countScene = createPreactScene(
       document.getElementById("app")!,
       CounterView,
       { wait }
@@ -44,7 +44,7 @@ export const setups: SceneSetup[] = [
     );
   },
   function room(store, { wait }) {
-    let roomScene = createPreactScene(
+    const roomScene = createPreactScene(
       document.getElementById("room")!,
       RoomView,
       {
@@ -59,12 +59,16 @@ export const setups: SceneSetup[] = [
     );
   },
   function waiting(store, { wait }) {
-    let [init, view] = WaitingViews;
+    const [init, view] = WaitingViews;
 
-    let waitingScene = createScene(document.getElementById("waiting")!, view, {
-      init,
-      wait,
-    });
+    const waitingScene = createScene(
+      document.getElementById("waiting")!,
+      view,
+      {
+        init,
+        wait,
+      }
+    );
 
     return store.subscribe(
       waitingScene,

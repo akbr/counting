@@ -2,7 +2,6 @@ import { h } from "preact";
 import { setup } from "goober";
 
 import { initFlow } from "./lib/initFlow";
-
 import { engine, CounterTypes } from "./engine";
 import { initScenes } from "./scenes";
 

@@ -18,20 +18,20 @@ const passthrough = <T>(val: T) => val;
 const shorthands = {
   x: {
     name: "translateX",
-    unit: toPx
+    unit: toPx,
   },
   y: {
     name: "translateY",
-    unit: toPx
+    unit: toPx,
   },
   scale: {
     name: "scale",
-    unit: passthrough
+    unit: passthrough,
   },
   rotate: {
     name: "rotate",
-    unit: toDeg
-  }
+    unit: toDeg,
+  },
 };
 
 function extractShorthands(styles: InputStyles) {
@@ -62,7 +62,7 @@ export function handleTransforms(
 
   let combo = {
     ...currentTransforms,
-    ...shorthandTransforms
+    ...shorthandTransforms,
   };
 
   let orderedString = Object.values(shorthands)
@@ -88,13 +88,13 @@ export function style(
   el: HTMLElement,
   styles: InputStyles,
   animationOptions: AnimationOptions
-): Controls<unknown>;
+): Controls;
 
 export function style(
   el: HTMLElement,
   styles: Styles,
   animationOptions?: AnimationOptions
-): void | Controls<unknown> {
+): void | Controls {
   const modStyles = handleTransforms(styles, el.style.transform);
 
   if (!animationOptions) {
@@ -116,6 +116,6 @@ export function style(
 
   return {
     finish: () => doApply(),
-    finished: animation.finished
+    finished: animation.finished,
   };
 }
