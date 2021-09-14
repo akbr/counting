@@ -6,9 +6,9 @@
     "jsxImportSource": "preact",
     "esModuleInterop": true,
     "sourceMap": true,
-    "allowJs": true,
     "lib": ["es2019", "dom"],
     "rootDir": "src",
     "moduleResolution": "node"
-  }
+  },
+  "exclude": ["dist/*", "node_modules/*"]
 }

@@ -8,13 +8,15 @@ import { engine } from "./engine";
 const PORT = process.env.PORT || 5000;
 const distPath = path.resolve("dist/");
 
-mount(
-  express()
-    .use(express.static(distPath))
-    .get("/", function (_, res) {
-      res.sendFile("index.html", { root: distPath });
-    })
-    .listen(PORT, function () {
-      return console.log("Listening on " + PORT);
-    })
-)(createServer(engine));
+const expressServer = express()
+  .use(express.static(distPath))
+  .get("/", function (_, res) {
+    res.sendFile("index.html", { root: distPath });
+  })
+  .listen(PORT, function () {
+    return console.log("Listening on " + PORT);
+  });
+
+const socketServer = createServer(engine);
+
+mount(expressServer, socketServer);

@@ -30,28 +30,29 @@ function addHeartbeat(wss: Server, ms = 25000) {
   });
 }
 
-export const mount =
-  (expressServer: Express.Application) =>
-  (socketServer: SocketServer<any, any>) => {
-    const wss = new Server({ server: expressServer as any });
-    addHeartbeat(wss);
+export const mount = (
+  expressServer: Express.Application,
+  socketServer: SocketServer<any, any>
+) => {
+  const wss = new Server({ server: expressServer as any });
+  addHeartbeat(wss);
 
-    wss.on("connection", function (ws) {
-      const socket: Socket<any,any> = {
-        send: (msg) => ws.send(JSON.stringify(msg)),
-        close: ws.close
-      };
+  wss.on("connection", function (ws) {
+    const socket: Socket<any, any> = {
+      send: (msg) => ws.send(JSON.stringify(msg)),
+      close: ws.close,
+    };
 
-      socketServer.onOpen(socket);
+    socketServer.onOpen(socket);
 
-      ws.on("message", function (msg: any) {
-        if (typeof msg === "string") {
-          socketServer.onInput(socket, JSON.parse(msg));
-        }
-      });
-
-      ws.on("close", function () {
-        socketServer.onClose(socket);
-      });
+    ws.on("message", function (msg: any) {
+      if (typeof msg === "string") {
+        socketServer.onInput(socket, JSON.parse(msg));
+      }
     });
-  };
+
+    ws.on("close", function () {
+      socketServer.onClose(socket);
+    });
+  });
+};
